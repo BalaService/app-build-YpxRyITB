@@ -1,8 +1,8 @@
 {
-  "appName": "My Web App",
-  "url": "https://example.com",
-  "packageName": "com.example.myapp",
-  "themeColor": "#0099FF",
+  "appName": "Snack Game",
+  "url": "https://he-is-talha.github.io/html-css-javascript-games/24-Snake-Game/",
+  "packageName": "com.snake.game",
+  "themeColor": "#666666",
   "toolbar": true,
   "pullToRefresh": true
 }
