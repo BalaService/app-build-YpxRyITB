@@ -1,0 +1,69 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      appName:
+        required: true
+        type: string
+      packageName:
+        required: true
+        type: string
+      themeColor:
+        required: false
+        type: string
+        default: "#0099FF"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Debug - verify committed files
+        run: |
+          echo "=== config.json ==="
+          cat assets/config.json
+          echo "=== icon file size ==="
+          ls -la assets/icon/
+          echo "=== splash file size ==="
+          ls -la assets/splash/
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Rename package / applicationId
+        run: |
+          flutter pub get
+          flutter pub run change_app_package_name:main ${{ inputs.packageName }}
+
+      - name: Set app display name
+        run: |
+          sed -i "s/android:label=\"[^\"]*\"/android:label=\"${{ inputs.appName }}\"/" android/app/src/main/AndroidManifest.xml
+
+      - name: Generate launcher icons
+        run: flutter pub run flutter_launcher_icons
+
+      - name: Generate splash screen
+        run: flutter pub run flutter_native_splash:create
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 1
+
+      - name: Create GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_id }}
+          files: build/app/outputs/flutter-apk/app-release.apk

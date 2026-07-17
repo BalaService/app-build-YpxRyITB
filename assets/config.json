@@ -1,0 +1,8 @@
+{
+  "appName": "My Web App",
+  "url": "https://example.com",
+  "packageName": "com.example.myapp",
+  "themeColor": "#0099FF",
+  "toolbar": true,
+  "pullToRefresh": true
+}
